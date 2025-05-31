@@ -67,7 +67,9 @@ export default function Home() {
         throw new Error(`API responded with status: ${response.status}`);
       }
       
-      const courseDetails = await response.json();
+      const data = await response.json();
+const courseDetails = data.course;
+
       addLog(`Successfully fetched details for ${courseDetails.club_name} - ${courseDetails.course_name}`);
       return courseDetails;
     } catch (error) {
