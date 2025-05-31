@@ -204,9 +204,22 @@ export default function Home() {
             const insertedCourse = await insertCourse(courseDetails, supabase);
             
             if (insertedCourse) {
-              // Get holes from the first tee box (male or female)
-              const tees = courseDetails.tees?.male || courseDetails.tees?.female || [];
-              const holes = tees.length > 0 ? tees[0].holes : [];
+              // Try all tee boxes, not just the first one (male or female)
+const teeSets = [
+  ...(courseDetails.tees?.male || []),
+  ...(courseDetails.tees?.female || [])
+];
+
+let selectedTee = teeSets.find(tee => tee?.holes && tee.holes.length > 0);
+
+if (!selectedTee) {
+  addLog(`⚠️ No valid tee with holes found for course ${courseDetails.course_name}`);
+  continue; // Skip hole insertion
+}
+
+const holes = selectedTee.holes;
+addLog(`✅ Using tee with ${holes.length} holes for course ${courseDetails.course_name}`);
+
               
               // Insert holes data
               const holesSuccess = await insertCourseHoles(insertedCourse.id, holes, supabase);
